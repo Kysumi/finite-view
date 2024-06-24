@@ -2,6 +2,8 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { createIPCHandler } from 'electron-trpc/main'
+import { router } from './api'
 
 function createWindow(): void {
   // Create the browser window.
@@ -25,6 +27,8 @@ function createWindow(): void {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
+
+  createIPCHandler({ router, windows: [mainWindow] })
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.

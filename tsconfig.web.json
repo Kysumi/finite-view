@@ -13,6 +13,9 @@
     "paths": {
       "@renderer/*": [
         "src/renderer/src/*"
+      ],
+      "@components/*": [
+        "src/renderer/src/components/ui"
       ]
     }
   }

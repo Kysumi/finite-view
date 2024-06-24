@@ -19,11 +19,6 @@ function App(): JSX.Element {
       <QueryClientProvider client={queryClient}>
         <div className="p-4 bg-slate-50">
           <p className="text-3xl font-bold underline">Hello world!</p>
-          <Button className="action">
-            <a target="_blank" rel="noreferrer">
-              Send IPC
-            </a>
-          </Button>
         </div>
 
         <Demo />

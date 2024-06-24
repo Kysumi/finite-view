@@ -28,7 +28,19 @@ export const router = t.router({
         ee.off('greeting', onGreet)
       }
     })
-  })
+  }),
+  test: t.procedure
+    .input(
+      z.object({
+        name: z.string()
+      })
+    )
+    .mutation(async (attribute) => {
+      console.log(attribute.input.name)
+      return {
+        name: attribute.input.name
+      }
+    })
 })
 
 export type AppRouter = typeof router

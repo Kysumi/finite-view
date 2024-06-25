@@ -12,7 +12,7 @@ import {
 import { useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useWatch } from 'react-hook-form';
 import { WithLabel } from '@renderer/components/ui/with-label';
 
 const formSchema = z.object({
@@ -181,6 +181,17 @@ const TableQueryBuilder = ({ tableInfo }: { tableInfo: TableInfo | undefined }) 
 
   console.log('FORM ERRORS:', errors);
 
+  const selectedIndex = useWatch({
+    control,
+    name: 'indexName'
+  });
+
+  const selectedIndexOption =
+    tableInfo?.indexes.gsiIndexes.find((index) => index.name === selectedIndex) ??
+    tableInfo?.indexes.primary;
+
+  console.log(selectedIndex, selectedIndexOption);
+
   return (
     <div>
       <form
@@ -193,7 +204,7 @@ const TableQueryBuilder = ({ tableInfo }: { tableInfo: TableInfo | undefined }) 
             control={control}
             rules={{ required: true }}
             render={({ field: { onChange, value } }) => (
-              <Select defaultValue={value} onOpenChange={(newValue) => onChange(newValue)}>
+              <Select defaultValue={value} onValueChange={(newValue) => onChange(newValue)}>
                 <SelectTrigger>
                   <SelectValue className="w-max[100px]" placeholder="Error" />
                 </SelectTrigger>
@@ -218,7 +229,10 @@ const TableQueryBuilder = ({ tableInfo }: { tableInfo: TableInfo | undefined }) 
             )}
           />
         </WithLabel>
-        <WithLabel labelText={'pk (Partition key)'} id="partition-key-input">
+        <WithLabel
+          labelText={`${selectedIndexOption?.partitionKey.AttributeName} (Partition key)`}
+          id="partition-key-input"
+        >
           <Input
             {...register('partitionKeyValue')}
             id="partition-key-input"
@@ -233,7 +247,7 @@ const TableQueryBuilder = ({ tableInfo }: { tableInfo: TableInfo | undefined }) 
               control={control}
               rules={{ required: true }}
               render={({ field: { onChange, value } }) => (
-                <Select defaultValue={value} onOpenChange={(newValue) => onChange(newValue)}>
+                <Select defaultValue={value} onValueChange={(newValue) => onChange(newValue)}>
                   <SelectTrigger>
                     <SelectValue className="w-max[100px]" placeholder="Error" />
                   </SelectTrigger>
@@ -250,7 +264,10 @@ const TableQueryBuilder = ({ tableInfo }: { tableInfo: TableInfo | undefined }) 
               )}
             />
           </WithLabel>
-          <WithLabel labelText={'sk (Sort key)'} id="sort-key-input">
+          <WithLabel
+            labelText={`${selectedIndexOption?.searchKey.AttributeName} (Sort key)`}
+            id="sort-key-input"
+          >
             <Input
               {...register('searchKey.value')}
               id="sort-key-input"

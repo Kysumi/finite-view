@@ -121,8 +121,14 @@ export const tableRouter = t.router({
         }
 
         return {
-          partitionKey: pk,
-          searchKey: sk
+          partitionKey: {
+            name: pk.AttributeName!,
+            type: 'HASH'
+          },
+          searchKey: {
+            name: sk.AttributeName!,
+            type: 'RANGE'
+          }
         };
       };
 

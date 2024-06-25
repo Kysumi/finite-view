@@ -124,23 +124,19 @@ export const Demo = () => {
 interface Indexes {
   primary: {
     partitionKey: {
-      AttributeName: string;
-      KeyType: KeyType;
+      name: string;
     };
     searchKey: {
-      AttributeName: string;
-      KeyType: KeyType;
+      name: string;
     };
   };
   gsiIndexes: {
     name: string;
     partitionKey: {
-      AttributeName: string;
-      KeyType: KeyType;
+      name: string;
     };
     searchKey: {
-      AttributeName: string;
-      KeyType: KeyType;
+      name: string;
     };
   }[];
 }
@@ -164,7 +160,7 @@ const TableQueryBuilder = ({ tableInfo }: { tableInfo: TableInfo | undefined }) 
     resolver: zodResolver(formSchema),
     defaultValues: {
       tableName: tableInfo?.tableName,
-      indexName: tableInfo?.indexes.primary.partitionKey.AttributeName,
+      indexName: tableInfo?.indexes.primary.partitionKey.name,
       searchKey: {
         operator: 'begins_with'
       }
@@ -211,10 +207,10 @@ const TableQueryBuilder = ({ tableInfo }: { tableInfo: TableInfo | undefined }) 
                 <SelectContent>
                   {tableInfo?.indexes.primary && (
                     <SelectItem
-                      key={tableInfo.indexes.primary.partitionKey.AttributeName}
-                      value={tableInfo.indexes.primary.partitionKey.AttributeName!}
+                      key={tableInfo.indexes.primary.partitionKey.name}
+                      value={tableInfo.indexes.primary.partitionKey.name}
                     >
-                      {tableInfo?.indexes.primary.partitionKey.AttributeName}
+                      {tableInfo?.indexes.primary.partitionKey.name}
                     </SelectItem>
                   )}
                   {tableInfo?.indexes.gsiIndexes.map((index) => {
@@ -230,7 +226,7 @@ const TableQueryBuilder = ({ tableInfo }: { tableInfo: TableInfo | undefined }) 
           />
         </WithLabel>
         <WithLabel
-          labelText={`${selectedIndexOption?.partitionKey.AttributeName} (Partition key)`}
+          labelText={`${selectedIndexOption?.partitionKey.name} (Partition key)`}
           id="partition-key-input"
         >
           <Input
@@ -265,7 +261,7 @@ const TableQueryBuilder = ({ tableInfo }: { tableInfo: TableInfo | undefined }) 
             />
           </WithLabel>
           <WithLabel
-            labelText={`${selectedIndexOption?.searchKey.AttributeName} (Sort key)`}
+            labelText={`${selectedIndexOption?.searchKey.name} (Sort key)`}
             id="sort-key-input"
           >
             <Input

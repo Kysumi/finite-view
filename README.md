@@ -20,6 +20,12 @@ $ pnpm install
 $ pnpm dev
 ```
 
+#### For Hot Realod on changing main process
+
+```bash
+$ pnpm dev -w
+```
+
 ### Build
 
 ```bash

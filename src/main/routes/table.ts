@@ -7,8 +7,7 @@ import {
   ListTablesCommand
 } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocument, QueryCommand } from '@aws-sdk/lib-dynamodb';
-
-import { fromEnv, fromTokenFile, fromSSO, fromIni } from '@aws-sdk/credential-providers';
+import { fromIni } from '@aws-sdk/credential-providers';
 
 const t = initTRPC.create({ isServer: true });
 
@@ -67,6 +66,19 @@ const getClient = () => {
  * TODO CHANGE END
  */
 
+const QueryPropsSchema = z.object({
+  tableName: z.string(),
+  indexName: z.string(),
+  partitionKeyValue: z.string(),
+  searchKey: z.object({
+    value: z.string(),
+    operator: z.enum(['=', '>', '<', '>=', '<=', 'between', 'begins_with'])
+  }),
+  limit: z.number().optional()
+});
+
+export type TQueryProps = z.infer<typeof QueryPropsSchema>;
+
 export const tableRouter = t.router({
   getConfig: t.procedure.query(async () => {
     return {
@@ -88,7 +100,6 @@ export const tableRouter = t.router({
   }),
   getAvailableTables: t.procedure.query(async () => {
     try {
-      console.log('FIRING QUERY!');
       const client = getClient();
       const tables = await client.send(new ListTablesCommand({}));
       return tables.TableNames?.map((table) => table) ?? [];
@@ -148,36 +159,23 @@ export const tableRouter = t.router({
         }
       };
     }),
-  queryTable: t.procedure
-    .input(
-      z.object({
-        tableName: z.string(),
-        indexName: z.string(),
-        partitionKeyValue: z.string(),
-        searchKey: z.object({
-          value: z.string(),
-          operator: z.enum(['=', '>', '<', '>=', '<=', 'between', 'begins_with'])
-        }),
-        limit: z.number().optional()
-      })
-    )
-    .mutation(async ({ input }) => {
-      const { tableName, indexName, partitionKeyValue, searchKey, limit } = input;
-      const client = getClient();
-      const command = new QueryCommand({
-        TableName: tableName,
-        KeyConditionExpression: `${indexName} = :index`,
-        ExpressionAttributeValues: {
-          ':index': partitionKeyValue
-        }
-      });
+  queryTable: t.procedure.input(QueryPropsSchema).mutation(async ({ input }) => {
+    const { tableName, indexName, partitionKeyValue } = input;
+    const client = getClient();
+    const command = new QueryCommand({
+      TableName: tableName,
+      KeyConditionExpression: `${indexName} = :index`,
+      ExpressionAttributeValues: {
+        ':index': partitionKeyValue
+      }
+    });
 
-      const result = await client.send(command);
+    const result = await client.send(command);
 
-      console.log(result);
+    console.log(result);
 
-      return result.Items ?? [];
-    })
+    return result.Items ?? [];
+  })
 });
 
 export type TableRouter = typeof tableRouter;

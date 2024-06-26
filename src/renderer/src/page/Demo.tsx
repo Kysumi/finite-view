@@ -62,12 +62,9 @@ export const Demo = () => {
       enabled: !!selectedTable
     }
   );
+  console.log('');
 
   const demo = trpc.useUtils();
-
-  console.log(tableConfig, tables);
-
-  console.log(tableInfo);
 
   return (
     <div className="p-4 flex flex-col gap-4">
@@ -194,47 +191,50 @@ const TableQueryBuilder = ({ tableInfo }: { tableInfo: TableInfo | undefined }) 
         onSubmit={handleSubmit((formData) => query.mutate(formData))}
         className="flex flex-col gap-4"
       >
-        <WithLabel id="index" labelText={'Select a table or index'} className="min-w-32">
-          <Controller
-            name="indexName"
-            control={control}
-            rules={{ required: true }}
-            render={({ field: { onChange, value } }) => (
-              <Select defaultValue={value} onValueChange={(newValue) => onChange(newValue)}>
-                <SelectTrigger>
-                  <SelectValue className="w-max[100px]" placeholder="Error" />
-                </SelectTrigger>
-                <SelectContent>
-                  {tableInfo?.indexes.primary && (
-                    <SelectItem
-                      key={tableInfo.indexes.primary.partitionKey.name}
-                      value={tableInfo.indexes.primary.partitionKey.name}
-                    >
-                      {tableInfo?.indexes.primary.partitionKey.name}
-                    </SelectItem>
-                  )}
-                  {tableInfo?.indexes.gsiIndexes.map((index) => {
-                    return (
-                      <SelectItem key={index.name} value={index.name}>
-                        {index.name}
+        <div className="flex gap-4">
+          <WithLabel id="index" labelText={'Select an index'} className="w-56">
+            <Controller
+              name="indexName"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { onChange, value } }) => (
+                <Select defaultValue={value} onValueChange={(newValue) => onChange(newValue)}>
+                  <SelectTrigger>
+                    <SelectValue className="w-max[100px]" placeholder="Error" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {tableInfo?.indexes.primary && (
+                      <SelectItem
+                        key={tableInfo.indexes.primary.partitionKey.name}
+                        value={tableInfo.indexes.primary.partitionKey.name}
+                      >
+                        {tableInfo?.indexes.primary.partitionKey.name}
                       </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </WithLabel>
-        <WithLabel
-          labelText={`${selectedIndexOption?.partitionKey.name} (Partition key)`}
-          id="partition-key-input"
-        >
-          <Input
-            {...register('partitionKeyValue')}
+                    )}
+                    {tableInfo?.indexes.gsiIndexes.map((index) => {
+                      return (
+                        <SelectItem key={index.name} value={index.name}>
+                          {index.name}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </WithLabel>
+          <WithLabel
+            labelText={`${selectedIndexOption?.partitionKey.name} (Partition key)`}
             id="partition-key-input"
-            placeholder={'Enter partition key value'}
-          />
-        </WithLabel>
+          >
+            <Input
+              className="w-full"
+              {...register('partitionKeyValue')}
+              id="partition-key-input"
+              placeholder={'Enter partition key value'}
+            />
+          </WithLabel>
+        </div>
 
         <div className="flex gap-2">
           <WithLabel id="sort-key-operator" labelText={'Operator'} className="min-w-32">

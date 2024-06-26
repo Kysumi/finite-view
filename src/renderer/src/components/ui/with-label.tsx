@@ -9,7 +9,7 @@ export const WithLabel = ({
   children
 }: PropsWithChildren & { labelText: string; id: string; className?: string }) => {
   return (
-    <div className={cn('grid max-w-sm items-center gap-1.5', className)}>
+    <div className={cn('grid items-center gap-1.5', className)}>
       <Label htmlFor={id}>{labelText}</Label>
       {children}
     </div>

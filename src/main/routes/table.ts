@@ -51,6 +51,7 @@ const regions = [
  * TODO CHANGE
  */
 let region = 'ap-southeast-2';
+let tableName: undefined | string = undefined;
 
 let dbClient = DynamoDBDocument.from(
   new DynamoDBClient({
@@ -82,7 +83,8 @@ export type TQueryProps = z.infer<typeof QueryPropsSchema>;
 export const tableRouter = t.router({
   getConfig: t.procedure.query(async () => {
     return {
-      region
+      region,
+      tableName
     };
   }),
   getSupportedRegions: t.procedure.query(() => {
@@ -97,6 +99,9 @@ export const tableRouter = t.router({
       })
     );
     region = input.region;
+  }),
+  setActiveTable: t.procedure.input(z.object({ tableName: z.string() })).mutation(({ input }) => {
+    tableName = input.tableName;
   }),
   getAvailableTables: t.procedure.query(async () => {
     try {

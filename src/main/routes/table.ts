@@ -87,13 +87,6 @@ export const tableRouter = t.router({
       return [];
     }
   }),
-  // getTableInformation: t.procedure
-  //   .input(z.object({ tableName: z.string() }))
-  //   .query(async ({ input }) => {
-  //     const { tableName } = input;
-  //
-  //     return getTableInformation({ tableName });
-  //   }),
   queryTable: t.procedure.input(QueryPropsSchema).mutation(async ({ input }) => {
     return queryTable(input);
   })

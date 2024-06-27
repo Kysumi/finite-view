@@ -1,7 +1,6 @@
 import { trpc } from '@renderer/api';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
 import { WithLabel } from '@renderer/components/ui/with-label';
 import {
   Select,
@@ -22,9 +21,7 @@ export const QueryBuilder = ({ tableInfo }: { tableInfo: TableInfo | undefined }
     register,
     handleSubmit,
     formState: { errors, isValid },
-    control,
-    setValue,
-    trigger
+    control
   } = useForm<TQueryProps>({
     resolver: zodResolver(QueryPropsSchema),
     defaultValues: {
@@ -37,13 +34,6 @@ export const QueryBuilder = ({ tableInfo }: { tableInfo: TableInfo | undefined }
     reValidateMode: 'onBlur'
   });
 
-  useEffect(() => {
-    trigger();
-    if (tableInfo) {
-      setValue('tableName', tableInfo.tableName);
-    }
-  }, [tableInfo]);
-
   console.log('FORM ERRORS:', errors);
 
   const selectedIndex = useWatch({
@@ -55,14 +45,13 @@ export const QueryBuilder = ({ tableInfo }: { tableInfo: TableInfo | undefined }
     tableInfo?.indexes.gsiIndexes.find((index) => index.name === selectedIndex) ??
     tableInfo?.indexes.primary;
 
-  console.log(selectedIndex, selectedIndexOption);
-
   return (
     <div>
       <form
         onSubmit={handleSubmit((formData) => query.mutate(formData))}
         className="flex flex-col gap-4"
       >
+        <input hidden={true} {...register('tableName')} />
         <div className="flex gap-4">
           <WithLabel id="index" labelText={'Select an index'} className="w-56">
             <Controller

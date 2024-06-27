@@ -13,7 +13,7 @@ export const TableSelection = () => {
   const setActiveTable = trpc.table.setActiveTable.useMutation();
 
   return (
-    <div className="p-4 flex flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <div className="flex gap-2">
         <WithLabel id="region-select" labelText={'Region'}>
           <ComboBox

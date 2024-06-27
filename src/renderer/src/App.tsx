@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { ipcLink } from 'electron-trpc/renderer';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { trpc } from '@renderer/api';
-import { Demo } from './page/Demo';
 import { TableSelection } from './components/TableSelection';
+import { QueryFilters } from '@renderer/components/QueryFilters';
 
-function App(): JSX.Element {
+const App = () => {
   const [queryClient] = useState(() => new QueryClient());
   const [trpcClient] = useState(() =>
     trpc.createClient({
@@ -16,11 +16,13 @@ function App(): JSX.Element {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <TableSelection />
-        <Demo />
+        <div className="flex flex-col gap-4 p-4">
+          <TableSelection />
+          <QueryFilters />
+        </div>
       </QueryClientProvider>
     </trpc.Provider>
   );
-}
+};
 
 export default App;

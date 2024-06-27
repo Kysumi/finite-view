@@ -13,6 +13,15 @@ import { Input } from '@renderer/components/ui/input';
 import { Button } from '@renderer/components/ui/button';
 import { TableInfo } from '../../../main/actions/getTableInformation';
 import { QueryPropsSchema, TQueryProps } from '../../../main/validators';
+import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@renderer/components/ui/table';
 
 export const QueryBuilder = ({ tableInfo }: { tableInfo: TableInfo | undefined }) => {
   const query = trpc.table.queryTable.useMutation();
@@ -137,8 +146,69 @@ export const QueryBuilder = ({ tableInfo }: { tableInfo: TableInfo | undefined }
           Search
         </Button>
       </form>
-      <pre>IS VALID: {isValid ? 'YES' : 'NO'}</pre>
+      {query.data && <DataTable data={query.data} />}
       <pre>RESULT: {JSON.stringify(query.data, null, 2)}</pre>
+    </div>
+  );
+};
+
+const DataTable = ({ data }: { data: Record<string, any>[] }) => {
+  const keySet = new Set<string>();
+
+  data?.forEach((obj) => {
+    Object.keys(obj).forEach((key) => keySet.add(key));
+  });
+
+  const columns = Array.from(keySet).map((key) => ({
+    accessorKey: key,
+    header: key
+  }));
+
+  console.log(columns);
+
+  const table = useReactTable({
+    data: data,
+    columns,
+    getCoreRowModel: getCoreRowModel()
+  });
+  return (
+    <div className="rounded-md border">
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                No results.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 };

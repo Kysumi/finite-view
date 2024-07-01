@@ -24,6 +24,9 @@ import {
 } from '@renderer/components/ui/table';
 import { DataTableColumnHeader } from '@renderer/components/table/Column';
 import { Checkbox } from '@renderer/components/ui/checkbox';
+import { NoResults } from '@renderer/components/table/NoResults';
+import { TableDataType } from '@renderer/components/table/TableDataType';
+import { DataCell } from '@renderer/components/table/DataCell';
 
 export const QueryBuilder = ({ tableInfo }: { tableInfo: TableInfo | undefined }) => {
   const query = trpc.table.queryTable.useMutation();
@@ -153,46 +156,17 @@ export const QueryBuilder = ({ tableInfo }: { tableInfo: TableInfo | undefined }
   );
 };
 
-const DataTable = ({
-  data
-}: {
-  data: Record<string, string | number | NonNullable<unknown>>[];
-}) => {
+const DataTable = ({ data }: { data: TableDataType[] }) => {
   const keySet = new Set<string>();
 
   data?.forEach((obj) => {
     Object.keys(obj).forEach((key) => keySet.add(key));
   });
 
-  const columns: ColumnDef<Record<string, string | number | NonNullable<unknown>>>[] = Array.from(
-    keySet
-  ).map((key) => ({
+  const columns: ColumnDef<TableDataType>[] = Array.from(keySet).map((key) => ({
     accessorKey: key,
     header: ({ column }) => <DataTableColumnHeader column={column} title={key} />,
-    cell: ({ row }) => {
-      const value = row.original[key];
-      console.log(row);
-
-      console.log(value);
-
-      if (typeof value === 'string') {
-        return <div>{value}</div>;
-      }
-
-      if (Array.isArray(value)) {
-        return <div>Not supported</div>;
-      }
-
-      if (typeof value === 'object') {
-        return <div>{JSON.stringify(value)}</div>;
-      }
-
-      if (typeof value === 'undefined') {
-        return <div></div>;
-      }
-
-      throw new Error(`Unsupported data type for ${key}`);
-    }
+    cell: DataCell
   }));
 
   columns.unshift({
@@ -231,7 +205,7 @@ const DataTable = ({
         {table.getFilteredSelectedRowModel().rows.length} of{' '}
         {table.getFilteredRowModel().rows.length} row(s) selected.
       </div>
-      <div className="rounded-md border ">
+      <div className="rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -260,11 +234,7 @@ const DataTable = ({
                 </TableRow>
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
-                </TableCell>
-              </TableRow>
+              <NoResults colSpan={columns.length} />
             )}
           </TableBody>
         </Table>

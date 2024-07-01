@@ -13,7 +13,7 @@ import { Input } from '@renderer/components/ui/input';
 import { Button } from '@renderer/components/ui/button';
 import { TableInfo } from '../../../main/actions/getTableInformation';
 import { QueryPropsSchema, TQueryProps } from '../../../main/validators';
-import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import { flexRender, getCoreRowModel, HeaderContext, useReactTable } from '@tanstack/react-table';
 import {
   Table,
   TableBody,
@@ -22,6 +22,7 @@ import {
   TableHeader,
   TableRow
 } from '@renderer/components/ui/table';
+import { DataTableColumnHeader } from '@renderer/components/table/Column';
 
 export const QueryBuilder = ({ tableInfo }: { tableInfo: TableInfo | undefined }) => {
   const query = trpc.table.queryTable.useMutation();
@@ -147,7 +148,6 @@ export const QueryBuilder = ({ tableInfo }: { tableInfo: TableInfo | undefined }
         </Button>
       </form>
       {query.data && <DataTable data={query.data} />}
-      <pre>RESULT: {JSON.stringify(query.data, null, 2)}</pre>
     </div>
   );
 };
@@ -161,18 +161,19 @@ const DataTable = ({ data }: { data: Record<string, any>[] }) => {
 
   const columns = Array.from(keySet).map((key) => ({
     accessorKey: key,
-    header: key
+    header: ({ column }: HeaderContext<any, any>) => (
+      <DataTableColumnHeader column={column} title={key} />
+    )
   }));
-
-  console.log(columns);
 
   const table = useReactTable({
     data: data,
     columns,
     getCoreRowModel: getCoreRowModel()
   });
+
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border mt-8">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

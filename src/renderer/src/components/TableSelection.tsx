@@ -7,10 +7,16 @@ export const TableSelection = () => {
 
   const { data: tableConfig } = trpc.table.getConfig.useQuery();
   const { data: regions } = trpc.table.getSupportedRegions.useQuery();
-  const { data: tables } = trpc.table.getAvailableTables.useQuery();
+  const { data: tables, error } = trpc.table.getAvailableTables.useQuery();
+
+  console.log(error);
 
   const setTableRegion = trpc.table.setRegion.useMutation();
   const setActiveTable = trpc.table.setActiveTable.useMutation();
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -28,8 +34,8 @@ export const TableSelection = () => {
             onChange={async (option) => {
               await setTableRegion.mutateAsync({ region: option.value });
 
-              utils.table.getConfig.invalidate();
-              utils.table.getAvailableTables.invalidate();
+              await utils.table.getConfig.invalidate();
+              await utils.table.getAvailableTables.invalidate();
             }}
             selectedOption={
               tableConfig ? { label: tableConfig.region, value: tableConfig.region } : undefined
@@ -51,7 +57,7 @@ export const TableSelection = () => {
             }
             onChange={async (option) => {
               await setActiveTable.mutateAsync({ tableName: option.value });
-              utils.table.getConfig.invalidate();
+              await utils.table.getConfig.invalidate();
             }}
             selectedOption={
               tableConfig?.tableName

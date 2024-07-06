@@ -1,6 +1,10 @@
 import { initTRPC } from '@trpc/server';
 import { z } from 'zod';
-import { DynamoDBClient, ListTablesCommand } from '@aws-sdk/client-dynamodb';
+import {
+  DynamoDBClient,
+  ListTablesCommand,
+  ConditionalCheckFailedException
+} from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb';
 import { fromIni } from '@aws-sdk/credential-providers';
 import { observable } from '@trpc/server/observable';
@@ -9,6 +13,8 @@ import { getTableInformation, TableInfo } from '../actions/getTableInformation';
 import { regions } from '../config/availableRegions';
 import { queryTable } from '../actions/queryTable';
 import { QueryPropsSchema } from '../validators';
+import {} from '@smithy/smithy-client';
+import { TRPCError } from '@trpc/server';
 
 const ee = new EventEmitter();
 
@@ -76,17 +82,25 @@ export const tableRouter = t.router({
       tableName = input.tableName;
       ee.emit('tableChanged', await getTableInformation({ tableName }));
     }),
+
   getAvailableTables: t.procedure.query(async () => {
     try {
       const client = getClient();
       const tables = await client.send(new ListTablesCommand({}));
       return tables.TableNames?.map((table) => table) ?? [];
     } catch (e) {
+      if (e?.name === 'ExpiredTokenException') {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'AWS credentials are missing or invalid'
+        });
+      }
       console.log('FAILED!');
       console.log(JSON.stringify(e, null, 2));
       return [];
     }
   }),
+
   queryTable: t.procedure.input(QueryPropsSchema).mutation(async ({ input }) => {
     return queryTable(input);
   })

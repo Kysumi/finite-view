@@ -18,8 +18,11 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      <div className={"bg-amber-600"}>
-        ROOT <Outlet />
+      /**
+       * System wide styles here
+       */
+      <div>
+        <Outlet />
       </div>
     ),
     ErrorBoundary: () => (

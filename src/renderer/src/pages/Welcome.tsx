@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 
 export const WelcomeRoute = () => {
   return (
-    <div>
-      <h1>Welcome to Finite View</h1>
+    <div className="flex flex-col gap-4 p-4">
+      <h1 className="text-3xl font-bold">Welcome to Finite View</h1>
 
       <h3>To use this application you will need to have an AWS account</h3>
 

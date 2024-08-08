@@ -12,13 +12,13 @@ export const GettingStarted = () => {
   const setTableRegion = trpc.table.setRegion.useMutation();
 
   return (
-    <div>
-      <h1>Getting Started</h1>
+    <div className="flex flex-col gap-4 p-4">
+      <h1 className="text-3xl font-bold">Getting Started</h1>
 
-      <h3>Set your default region</h3>
-      <p>This is the region that will be used for all your queries</p>
-      <br />
-
+      <div>
+        <h3>Set your default region</h3>
+        <p>This is the region that will be used for all your queries</p>
+      </div>
       <WithLabel id="region-select" labelText={"Region"}>
         <ComboBox
           options={

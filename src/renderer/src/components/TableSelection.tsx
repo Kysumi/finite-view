@@ -1,6 +1,6 @@
-import { trpc } from '@renderer/api';
-import { ComboBox } from './ui/combo-box';
-import { WithLabel } from './ui/with-label';
+import { trpc } from "@renderer/api";
+import { ComboBox } from "./ui/combo-box";
+import { WithLabel } from "./ui/with-label";
 
 export const TableSelection = () => {
   const utils = trpc.useUtils();
@@ -20,14 +20,14 @@ export const TableSelection = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-2">
-        <WithLabel id="region-select" labelText={'Region'}>
+      <div className="flex flex-col gap-4">
+        <WithLabel id="region-select" labelText={"Region"}>
           <ComboBox
             options={
               regions?.map((region) => {
                 return {
                   label: region,
-                  value: region
+                  value: region,
                 };
               }) ?? []
             }
@@ -38,20 +38,22 @@ export const TableSelection = () => {
               await utils.table.getAvailableTables.invalidate();
             }}
             selectedOption={
-              tableConfig ? { label: tableConfig.region, value: tableConfig.region } : undefined
+              tableConfig
+                ? { label: tableConfig.region, value: tableConfig.region }
+                : undefined
             }
           />
         </WithLabel>
 
-        <WithLabel id="table-select" labelText={'Table'}>
+        <WithLabel id="table-select" labelText={"Table"}>
           <ComboBox
-            className={'w-full'}
+            className={"w-full"}
             placeHolder="Select Table"
             options={
               tables?.map((table) => {
                 return {
                   label: table,
-                  value: table
+                  value: table,
                 };
               }) ?? []
             }
@@ -61,7 +63,10 @@ export const TableSelection = () => {
             }}
             selectedOption={
               tableConfig?.tableName
-                ? { label: tableConfig?.tableName, value: tableConfig?.tableName }
+                ? {
+                    label: tableConfig?.tableName,
+                    value: tableConfig?.tableName,
+                  }
                 : undefined
             }
           />
